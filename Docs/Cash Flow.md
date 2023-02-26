@@ -54,21 +54,21 @@ Apply Style: Accent 2
         {Column: <current>} = 2:
             {Chart of Accounts; Column R; Row: <current>}                           -- (Category 1)
         {Column: <current>} = 3:
-            {Chart of Accounts; Column S; Row: <current>}                           -- (Category 2)
+            {Chart of Accounts; Column T; Row: <current>}                           -- (Category 2)
         {Column: <current>; Row: 1} is a number (__NOTE__ - dates are numbers):     -- (Cash Flow date)
             switch:
                 {Column: A; Row: <current>} is not blank:
-                    Sum of:
-                                {Column: <current>; Row: <current  + 1>}
-                        through {Column: <current>; Row: <one less than the first row found *after* the current with non-blank in Column <current>>
-                        where:
-                                {Column: A; Row: <corresponding>} is not blank
+                    Sum of:                                                                                                                             -- Equates to:
+                                {Column: <current>; Row: <current  + 1>}                                                                                --  Sum of all rows for Column C (Account)
+                        through {Column: <current>; Row: <one less than the first row found *after* the current with non-blank in Column <current>>     --  Between the row after current
+                        where:                                                                                                                          --  and the row just prior to the next non-blank Column A (Type)
+                                {Column: C; Row: <corresponding>} is not blank                                                                          -- (Account)
                 {Column: B; Row: <current>} is not blank:
-                    Sum of:
-                                {Column: <current>; Row: <current  + 1>}
-                        through {Column: <current>; Row: <one less than the first row found *after* the current with non-blank in Column <current>>
-                        where:
-                                {Column: A; Row: <corresponding>} is not blank
+                    Sum of:                                                                                                                             -- Equates to:
+                                {Column: <current>; Row: <current  + 1>}                                                                                --  Sum of all rows for Column C (Account)
+                        through {Column: <current>; Row: <one less than the first row found *after* the current with non-blank in Column <current>>     --  Between the row after current
+                        where:                                                                                                                          --  and the row just prior to the next non-blank Column A (Type)
+                                {Column: A; Row: <corresponding>} is not blank                                                                          -- (Account)
                 {Column: C; Row: <current>} is not blank:
                             /*
                              * OPENING BALANCE
@@ -149,226 +149,442 @@ Apply Style: Accent 2
                      * __START__ - BUDGET
                      */
                     PLUS    (
-                                IF {Column <current>; Row 1} GTE "TODAY":
+                                IF {Column <current>; Row 1} > "TODAY":
                                     (
-                                        /*
-                                         *  __START__ - NON-SPREAD
-                                         */
-                                                (
-                                                    Sum of:
-                                                                {Transactions - Budget; Column D; Row 3}                -- (Debits)
-                                                        through {Transactions - Budget; Column D; Row 5000}
-                                                        where:
-                                                                {Transactions - Budget; Column A: Row <corresponding>}  -- (Budget Date)
-                                                                    > "TODAY"
-                                                            AND {Transactions - Budget; Column A: Row <corresponding>}  -- (Budget Date)
-                                                                    <= {Column: <current>; Row: 1}                      -- (Cash Flow date)
-                                                            AND {Transactions - Budget; Column C: Row <corresponding>}  -- (Full account name)
-                                                                    = {Chart of Accounts; Column: X; Row: <current>}    -- (Full account name)
-                                                            AND {Transactions - Budget; Column K: Row <corresponding>}  -- (Spread flag/days)
-                                                                    is blank
-                                                    Multipiled By:
-                                                        {Chart of Accounts; Column Z; Row: <current>}                   -- (Contra flag)
-                                                    Multiplied By:
-                                                        IF account type increases by debits THEN
-                                                            1
-                                                        ELSE
-                                                            -1
-                                                )
-                                        PLUS    (
-                                                    Sum of:
-                                                                {Transactions - Budget; Column E; Row 3}                -- (Credits)
-                                                        through {Transactions - Budget; Column E; Row 5000}
-                                                        where:
-                                                                {Transactions - Budget; Column A: Row <corresponding>}  -- (Budget Date)
-                                                                    > "TODAY"
-                                                            AND {Transactions - Budget; Column A: Row <corresponding>}  -- (Budget Date)
-                                                                    <= {Column: <current>; Row: 1}                      -- (Cash Flow date)
-                                                            AND {Transactions - Budget; Column C: Row <corresponding>}  -- (Full account name)
-                                                                    = {Chart of Accounts; Column: X; Row: <current>}    -- (Full account name)
-                                                            AND {Transactions - Budget; Column K: Row <corresponding>}  -- (Spread flag/days)
-                                                                    is blank
-                                                    Multipiled By:
-                                                        {Chart of Accounts; Column Z; Row: <current>}                   -- (Contra flag)
-                                                    Multiplied By:
-                                                        IF account type increases by credits THEN
-                                                            1
-                                                        ELSE
-                                                            -1
-                                                )
-                                        /*
-                                         *   __END__  - NON-SPREAD
-                                         */
+                                        (
+                                            /*
+                                             *  __START__ - NON-SPREAD
+                                             */
+                                                    (
+                                                        Sum of:
+                                                                    {Transactions - Budget; Column D; Row 3}                -- (Debits)
+                                                            through {Transactions - Budget; Column D; Row 5000}
+                                                            where:
+                                                                    {Transactions - Budget; Column A: Row <corresponding>}  -- (Budget Date)
+                                                                        > "TODAY"
+                                                                AND {Transactions - Budget; Column A: Row <corresponding>}  -- (Budget Date)
+                                                                        <= {Column: <current>; Row: 1}                      -- (Cash Flow date)
+                                                                AND {Transactions - Budget; Column C: Row <corresponding>}  -- (Full account name)
+                                                                        = {Chart of Accounts; Column: X; Row: <current>}    -- (Full account name)
+                                                                AND {Transactions - Budget; Column K: Row <corresponding>}  -- (Spread flag/days)
+                                                                        is blank
+                                                        Multipiled By:
+                                                            {Chart of Accounts; Column Z; Row: <current>}                   -- (Contra flag)
+                                                        Multiplied By:
+                                                            IF account type increases by debits THEN
+                                                                1
+                                                            ELSE
+                                                                -1
+                                                    )
+                                            PLUS    (
+                                                        Sum of:
+                                                                    {Transactions - Budget; Column E; Row 3}                -- (Credits)
+                                                            through {Transactions - Budget; Column E; Row 5000}
+                                                            where:
+                                                                    {Transactions - Budget; Column A: Row <corresponding>}  -- (Budget Date)
+                                                                        > "TODAY"
+                                                                AND {Transactions - Budget; Column A: Row <corresponding>}  -- (Budget Date)
+                                                                        <= {Column: <current>; Row: 1}                      -- (Cash Flow date)
+                                                                AND {Transactions - Budget; Column C: Row <corresponding>}  -- (Full account name)
+                                                                        = {Chart of Accounts; Column: X; Row: <current>}    -- (Full account name)
+                                                                AND {Transactions - Budget; Column K: Row <corresponding>}  -- (Spread flag/days)
+                                                                        is blank
+                                                        Multipiled By:
+                                                            {Chart of Accounts; Column Z; Row: <current>}                   -- (Contra flag)
+                                                        Multiplied By:
+                                                            IF account type increases by credits THEN
+                                                                1
+                                                            ELSE
+                                                                -1
+                                                    )
+                                            /*
+                                             *   __END__  - NON-SPREAD
+                                             */
+                                        )
                                         /*
                                          *  __START__ - SPREAD
                                          */
                                         /*
-                                         * __START__ - BUDGET MONTH *ON OR AFTER* CASH FLOW MONTH
+                                         * __START__ -      Budget date during current month
+                                         *              AND Budget date on or before Cash Flow date
                                          */
-                                        PLUS    (
-                                                    (
-                                                        Sum of:
-                                                                    {
-                                                                        Transactions - Budget;
-                                                                        Column: <
-                                                                                            19                                                                      -- (Debits)
-                                                                                    PLUS    (
-                                                                                                            /*
-                                                                                                             * ADJUSTMENT FOR
-                                                                                                             * current days beyond the BUDGET date
-                                                                                                            (
-                                                                                                                        DAY of {Column: <current>; Row: 1}          -- (Cash flow date)
-                                                                                                                MIUNS   IF
-                                                                                                                                {Column: <current>; Row: 1} >= TODAY
-                                                                                                                            AND {Column: <current>; Row: 1} <= end-of-month of TODAY
-                                                                                                                        THEN
-                                                                                                                            DAY of TODAY
-                                                                                                                        ELSE
-                                                                                                                            0
-                                                                                                            )
-                                                                                                MULTIPLY    2
+                                        PLUS (
+                                            /* __START__ - Debits */
+                                            (
+                                                (
+                                                    Sum of:
+                                                                {
+                                                                    Transactions - Budget;
+                                                                    Column: <
+                                                                                        19                                                                      -- (Debits cumulative as of date)
+                                                                                PLUS    (
+                                                                                            /*
+                                                                                             * ADJUSTMENT FOR
+                                                                                             * budget amount remaining as of today (Cash Flow date during current month)
+                                                                                             * or full budget amount (all other cases)
+                                                                                             */
+                                                                                            (
+                                                                                                IF {Column: <current>; Row 1} <= end of month of TODAY:         -- (Cash Flow date)
+                                                                                                    Day of month of today
+                                                                                                ELSE:
+                                                                                                    Day of last day of month of TODAY month
                                                                                             )
-                                                                                >;
-                                                                        Row: 3
-                                                                    }
-                                                            through {
-                                                                        Transactions - Budget;
-                                                                        Column: <
-                                                                                            19                                                                      -- (Debits)
-                                                                                    PLUS    (
-                                                                                                            /*
-                                                                                                             * ADJUSTMENT FOR
-                                                                                                             * current days beyond the BUDGET date
-                                                                                                            (
-                                                                                                                        DAY of {Column: <current>; Row: 1}          -- (Cash flow date)
-                                                                                                                MIUNS   IF
-                                                                                                                                {Column: <current>; Row: 1} >= TODAY
-                                                                                                                            AND {Column: <current>; Row: 1} <= end-of-month of TODAY
-                                                                                                                        THEN
-                                                                                                                            DAY of TODAY
-                                                                                                                        ELSE
-                                                                                                                            0
-                                                                                                            )
-                                                                                                MULTIPLY    2
-                                                                                            )
-                                                                                >;
-                                                                        Row: 3
-                                                                    }
-                                                            where:
-                                                                    {Transactios - Budget; Column: A; Row: <corresponding>}                                         -- (Budget date)
-                                                                        > end of month prior to the Cash Flow Date
-                                                                AND {Transactios - Budget; Column: A; Row: <corresponding>}                                         -- (Budget date)
-                                                                        <= {Column: <current>; Row 1}                                                               -- (Cash Flow date)
-                                                                AND {Transactios - Budget; Column: C; Row: <corresponding>}                                         -- (Full account name)
-                                                                        = {Chart of Accounts; Column: X, Row: <current>}                                            -- (Full account name)
-                                                                AND {Transactios - Budget; Column: K; Row: <corresponding>}                                         -- (Spread flag/number)
-                                                                    is not blank
-                                                    )
-                                                    MULTIPLY BY:
-                                                        {"Chart of Accounts: Column: Z; Row: <current>}                                                             -- (Contra flag)
-                                                    MULTIPLY BY:
-                                                        IF account increases by debits THEN:
-                                                            1
-                                                        ELSE:
-                                                            -1
+                                                                                            MULTIPLY    2
+                                                                                        )
+                                                                            >;
+                                                                    Row: 3
+                                                                }
+                                                        through {
+                                                                    Transactions - Budget;
+                                                                    Column: <
+                                                                                        19                                                                      -- (Debits cumulative as of date)
+                                                                                PLUS    (
+                                                                                                        /*
+                                                                                                         * ADJUSTMENT FOR
+                                                                                                         * current days beyond the BUDGET date
+                                                                                                        (
+                                                                                                                    DAY of {Column: <current>; Row: 1}          -- (Cash flow date)
+                                                                                                            MIUNS   IF
+                                                                                                                            {Column: <current>; Row: 1} >= TODAY
+                                                                                                                        AND {Column: <current>; Row: 1} <= end-of-month of TODAY
+                                                                                                                    THEN
+                                                                                                                        DAY of TODAY
+                                                                                                                    ELSE
+                                                                                                                        0
+                                                                                                        )
+                                                                                            MULTIPLY    2
+                                                                                        )
+                                                                            >;
+                                                                    Row: 3
+                                                                }
+                                                        where:
+                                                                {Transactios - Budget; Column: A; Row: <corresponding>}                                         -- (Budget date)
+                                                                    > end of month prior to month of TODAY                                                      -- >= first of current month
+                                                            AND {Transactios - Budget; Column: A; Row: <corresponding>}                                         -- (Budget date)
+                                                                    <= end of month of TODAY                                                                    -- <= last of current month
+                                                            AND {Transactios - Budget; Column: A; Row: <corresponding>}                                         -- (Budget date)
+                                                                    <= {Column: <current>; Row: 1}                                                              -- (<= Cash Flow date)
+                                                            AND {Transactios - Budget; Column: C; Row: <corresponding>}                                         -- (Full account name)
+                                                                    = {Chart of Accounts; Column: X, Row: <current>}                                            -- (= Full account name)
+                                                            AND {Transactios - Budget; Column: K; Row: <corresponding>}                                         -- (Spread flag/number)
+                                                                is not blank
                                                 )
-                                        PLUS    (
-                                                    (
-                                                        Sum of:
-                                                                    {
-                                                                        Transactions - Budget;
-                                                                        Column: <
-                                                                                            19
-                                                                                    PLUS    (
-                                                                                                            /*
-                                                                                                             * ADJUSTMENT FOR
-                                                                                                             * current days beyond the BUDGET date
-                                                                                                            (
-                                                                                                                        DAY of {Column: <current>; Row: 1}        -- (Cash flow date)
-                                                                                                                MIUNS   IF
-                                                                                                                                {Column: <current>; Row: 1} >= TODAY
-                                                                                                                            AND {Column: <current>; Row: 1} <= end-of-month of TODAY
-                                                                                                                        THEN
-                                                                                                                            DAY of TODAY
-                                                                                                                        ELSE
-                                                                                                                            0
-                                                                                                            )
-                                                                                                MULTIPLY    2
+                                                MULTIPLY BY:
+                                                    {"Chart of Accounts: Column: Z; Row: <current>}                                                             -- (Contra flag)
+                                                MULTIPLY BY:
+                                                    IF account increases by debits THEN:
+                                                        1
+                                                    ELSE:
+                                                        -1
+                                            )
+                                            /*  __END__  - Debits   */
+                                            /* __START__ - Credits  */
+                                            PLUS (
+                                                (
+                                                    Sum of:
+                                                                {
+                                                                    Transactions - Budget;
+                                                                    Column: <
+                                                                                        19                                                                      -- (Credits cumulative as of date)
+                                                                                PLUS    (
+                                                                                            /*
+                                                                                             * ADJUSTMENT FOR
+                                                                                             * budget amount remaining as of today (Cash Flow date during current month)
+                                                                                             * or full budget amount (all other cases)
+                                                                                             */
+                                                                                            (
+                                                                                                IF {Column: <current>; Row 1} <= end of month of TODAY:         -- (Cash Flow date)
+                                                                                                    Day of month of today
+                                                                                                ELSE:
+                                                                                                    Day of last day of month of TODAY month
                                                                                             )
-                                                                                    PLUS    1                                                                       -- (Credits)
-                                                                                >;
-                                                                        Row: 3
-                                                                    }
-                                                            through {
-                                                                        Transactions - Budget;
-                                                                        Column: <
-                                                                                            19
-                                                                                    PLUS    (
-                                                                                                            /*
-                                                                                                             * ADJUSTMENT FOR
-                                                                                                             * current days beyond the BUDGET date
-                                                                                                            (
-                                                                                                                        DAY of {Column: <current>; Row: 1}          -- (Cash flow date)
-                                                                                                                MIUNS   IF
-                                                                                                                                {Column: <current>; Row: 1} >= TODAY
-                                                                                                                            AND {Column: <current>; Row: 1} <= end-of-month of TODAY
-                                                                                                                        THEN
-                                                                                                                            DAY of TODAY
-                                                                                                                        ELSE
-                                                                                                                            0
-                                                                                                            )
-                                                                                                MULTIPLY    2
-                                                                                            )
-                                                                                    PLUS    1                                                                       -- (Credits)
-                                                                                >;
-                                                                        Row: 3
-                                                                    }
-                                                            where:
-                                                                    {Transactios - Budget; Column: A; Row: <corresponding>}                                         -- (Budget date)
-                                                                        > end of month prior to the Cash Flow Date
-                                                                AND {Transactios - Budget; Column: A; Row: <corresponding>}                                         -- (Budget date)
-                                                                        <= {Column: <current>; Row 1}                                                               -- (Cash Flow date)
-                                                                AND {Transactios - Budget; Column: C; Row: <corresponding>}                                         -- (Full account name)
-                                                                        = {Chart of Accounts; Column: X, Row: <current>}                                            -- (Full account name)
-                                                                AND {Transactios - Budget; Column: K; Row: <corresponding>}                                         -- (Spread flag/number)
-                                                                    is not blank
-                                                    )
-                                                    MULTIPLY BY:
-                                                        {"Chart of Accounts: Column: Z; Row: <current>}                                                             -- (Contra flag)
-                                                    MULTIPLY BY:
-                                                        IF account increases by credits THEN:
-                                                            1
-                                                        ELSE:
-                                                            -1
+                                                                                            MULTIPLY    2
+                                                                                        )
+                                                                                PLUS    1                                                                       -- (Credits cumulative as of date)
+                                                                            >;
+                                                                    Row: 3
+                                                                }
+                                                        through {
+                                                                    Transactions - Budget;
+                                                                    Column: <
+                                                                                        19                                                                      -- (Creditscumulative as of date)
+                                                                                PLUS    (
+                                                                                                        /*
+                                                                                                         * ADJUSTMENT FOR
+                                                                                                         * current days beyond the BUDGET date
+                                                                                                        (
+                                                                                                                    DAY of {Column: <current>; Row: 1}          -- (Cash flow date)
+                                                                                                            MIUNS   IF
+                                                                                                                            {Column: <current>; Row: 1} >= TODAY
+                                                                                                                        AND {Column: <current>; Row: 1} <= end-of-month of TODAY
+                                                                                                                    THEN
+                                                                                                                        DAY of TODAY
+                                                                                                                    ELSE
+                                                                                                                        0
+                                                                                                        )
+                                                                                            MULTIPLY    2
+                                                                                        )
+                                                                                PLUS    1                                                                       -- (Credits cumulative as of date)
+                                                                            >;
+                                                                    Row: 3
+                                                                }
+                                                        where:
+                                                                {Transactios - Budget; Column: A; Row: <corresponding>}                                         -- (Budget date)
+                                                                    > end of month prior to month of TODAY                                                      -- >= first of current month
+                                                            AND {Transactios - Budget; Column: A; Row: <corresponding>}                                         -- (Budget date)
+                                                                    <= end of month of TODAY                                                                    -- <= last of current month
+                                                            AND {Transactios - Budget; Column: A; Row: <corresponding>}                                         -- (Budget date)
+                                                                    <= {Column: <current>; Row: 1}                                                              -- (<= Cash Flow date)
+                                                            AND {Transactios - Budget; Column: C; Row: <corresponding>}                                         -- (Full account name)
+                                                                    = {Chart of Accounts; Column: X, Row: <current>}                                            -- (= Full account name)
+                                                            AND {Transactios - Budget; Column: K; Row: <corresponding>}                                         -- (Spread flag/number)
+                                                                is not blank
                                                 )
+                                                MULTIPLY BY:
+                                                    {"Chart of Accounts: Column: Z; Row: <current>}                                                             -- (Contra flag)
+                                                MULTIPLY BY:
+                                                    IF account increases by debits THEN:
+                                                        1
+                                                    ELSE:
+                                                        -1
+                                            )
+                                            /*  __END__  - Credits */
+                                        )
                                         /*
-                                         *  __END__  - BUDGET MONTH *ON OR AFTER* CASH FLOW MONTH
+                                         *  __END__  -      Budget date during current month
+                                         *              AND Budget date on or before Cash Flow date
                                          */
                                         /*
-                                         * __START__ - BUDGET MONTH *BEFORE* CASH FLOW MONTH
+                                         * __START__ -      Budget date during current month
+                                         *              AND Budget date on or before Cash Flow date
+                                         *
+                                         *              Backout amouts used as of TODAY
                                          */
-                                        PLUS    (
-                                                                (
-                                                                    Sum of:
-                                                                                {Transactios - Budget; Column D; Row: 3}                                            -- (Debits)
-                                                                        through {Transactios - Budget; Column D; Row: 5000}
-                                                                        where:
-                                                                                {Transactios - Budget; Column A; Row: <corresponding>}                              -- (Budget date)
-                                                                                    <= end-of-month prior to Cash Flow date
-                                                                            AND {Transactios - Budget; Column C; Row: <corresponding>}                              -- (Account full name)
-                                                                                    = {Chart of Accounts; Column: X, Row: <current>}                                -- (Account full name)
-                                                                            AND {Transactios - Budget; Column C; Row: <corresponding>}                              -- (Spread flag/number)
-                                                                                    is not blank
-                                                                )
-                                                    MULTIPLY BY {Chart of Accounts; Column: Z; Row: <current>}                                                      -- (Contra flag)
-                                                    MULTIPLY BY (
-                                                                    IF account increases by debits THEN:
-                                                                        1
-                                                                    ELSE
-                                                                        -1
-                                                                )
-
+                                        PLUS (
+                                            /*
+                                             *  __START__ - Debits
+                                             */
+                                            (
+                                                Sum of:
+                                                            {Transactions - Budget; Column P; Row 3}                -- (Debits used as of today)
+                                                    through {Transactions - Budget; Column P; Row 5000}
+                                                    where:
+                                                            {Transactions - Budget; Column A: Row <corresponding>}  -- (Budget Date)
+                                                                > "TODAY"
+                                                        AND {Transactions - Budget; Column A: Row <corresponding>}  -- (Budget Date)
+                                                                <= {Column: <current>; Row: 1}                      -- (Cash Flow date)
+                                                        AND {Transactions - Budget; Column C: Row <corresponding>}  -- (Full account name)
+                                                                = {Chart of Accounts; Column: X; Row: <current>}    -- (Full account name)
+                                                        AND {Transactions - Budget; Column K: Row <corresponding>}  -- (Spread flag/days)
+                                                                is not blank
+                                                Multipiled By:
+                                                    {Chart of Accounts; Column Z; Row: <current>}                   -- (Contra flag)
+                                                Multiplied By:
+                                                    IF account type increases by debits THEN
+                                                        1
+                                                    ELSE
+                                                        -1
+                                            )
+                                            /*
+                                             *  __END__  - Debits
+                                             */
+                                            /*
+                                             * __START__ - Credits
+                                             */
+                                            PLUS (
+                                                Sum of:
+                                                            {Transactions - Budget; Column Q; Row 3}                -- (Credits used as of today)
+                                                    through {Transactions - Budget; Column Q; Row 5000}
+                                                    where:
+                                                            {Transactions - Budget; Column A: Row <corresponding>}  -- (Budget Date)
+                                                                > "TODAY"
+                                                        AND {Transactions - Budget; Column A: Row <corresponding>}  -- (Budget Date)
+                                                                <= {Column: <current>; Row: 1}                      -- (Cash Flow date)
+                                                        AND {Transactions - Budget; Column C: Row <corresponding>}  -- (Full account name)
+                                                                = {Chart of Accounts; Column: X; Row: <current>}    -- (Full account name)
+                                                        AND {Transactions - Budget; Column K: Row <corresponding>}  -- (Spread flag/days)
+                                                                is not blank
+                                                Multipiled By:
+                                                    {Chart of Accounts; Column Z; Row: <current>}                   -- (Contra flag)
+                                                Multiplied By:
+                                                    IF account type increases by credits THEN
+                                                        1
+                                                    ELSE
+                                                        -1
+                                            )
+                                            /*
+                                             *  __END__  - Credits
+                                             */
+                                        )
+                                        /*
+                                         *  __END __  -     Budget date during current month
+                                         *              AND Budget date on or before Cash Flow date
+                                         *
+                                         *              Backout amouts used as of TODAY
+                                         */
+                                        /*
+                                         * __START__ -      Budget date *after* end of month of TODAY
+                                         *              AND Budget date *on or after* Cash Flow date
+                                         *              AND Budget date *on or before* Cash Flow date
+                                         */
+                                        PLUS (
+                                            /* __START__ - Debits /*
+                                            (
+                                                (
+                                                    Sum of:
+                                                        {
+                                                            Transactions - Budget;
+                                                            Column: <
+                                                                        19                                                                                          -- (Debits)
+                                                                PLUS    (
+                                                                            Day of ({Column: <current>; Row: 1}                                                     -- (Day of Cash Flow date)
+                                                                            MULTIPLY 2
+                                                                        )
+                                                            >;
+                                                            Row: 3
+                                                        }
+                                                        through {
+                                                            Transactions - Budget;
+                                                            Column: <
+                                                                        19                                                                                          -- (Debits)
+                                                                PLUS    (
+                                                                            Day of ({Column: <current>; Row: 1}                                                     -- (Day of Cash Flow date)
+                                                                            MULTIPLY 2
+                                                                        )
+                                                            >;
+                                                            Row: 5000
+                                                        }
+                                                    where:
+                                                            {Transactios - Budget; Column A; Row: <corresponding>} > end of month of today                          -- (Budget date)
+                                                        AND {Transactios - Budget; Column A; Row: <corresponding>}                                                  -- (Budget date)
+                                                                > end of month prior to {Column: <current>; Row: 1}                                                 -- (Cash Flow date)
+                                                        AND {Transactios - Budget; Column A; Row: <corresponding>}                                                  -- (Budget date)
+                                                                <= {Column <current>; Row: 1}                                                                       -- (Cash Flow date)
+                                                        AND {Transactions - Budget; Column C: Row <corresponding>}                                                  -- (Full account name)
+                                                                = {Chart of Accounts; Column: X; Row: <current>}                                                    -- (Full account name)
+                                                        AND {Transactions - Budget; Column K: Row <corresponding>}                                                  -- (Spread flag/days)
+                                                                is not blank
                                                 )
+                                                MULTIPLY BY {Chart of Accounts; Column: Z; Row: <current>}                                                      -- (Contra flag)
+                                                MULTIPLY BY (
+                                                                IF account increases by debits THEN:
+                                                                    1
+                                                                ELSE
+                                                                    -1
+                                                            )
+                                            )
+                                            /*  __END__  - Debits /*
+                                            /* __START__ - Credits /*
+                                            PLUS (
+                                                (
+                                                    Sum of:
+                                                        {
+                                                            Transactions - Budget;
+                                                            Column: <
+                                                                        19                                                                                          -- (Credits)
+                                                                PLUS    (
+                                                                            Day of ({Column: <current>; Row: 1}                                                     -- (Day of Cash Flow date)
+                                                                            MULTIPLY 2
+                                                                        )
+                                                                        PLUS 1                                                                                      -- (Credits)
+                                                            >;
+                                                            Row: 3
+                                                        {
+                                                        through {
+                                                            Transactions - Budget;
+                                                            Column: <
+                                                                        19                                                                                          -- (Credits)
+                                                                PLUS    (
+                                                                            Day of ({Column: <current>; Row: 1}                                                     -- (Day of Cash Flow date)
+                                                                            MULTIPLY 2
+                                                                        )
+                                                                        PLUS 1                                                                                      -- (Credits)
+                                                            >;
+                                                            Row: 5000
+                                                        }
+                                                    where:
+                                                            {Transactios - Budget; Column A; Row: <corresponding>} > end of month of today                          -- (Budget date)
+                                                        AND {Transactios - Budget; Column A; Row: <corresponding>}                                                  -- (Budget date)
+                                                                > end of month prior to {Column: <current>; Row: 1}                                                 -- (Cash Flow date)
+                                                        AND {Transactios - Budget; Column A; Row: <corresponding>}                                                  -- (Budget date)
+                                                                <= {Column <current>; Row: 1}                                                                       -- (Cash Flow date)
+                                                        AND {Transactions - Budget; Column C: Row <corresponding>}                                                  -- (Full account name)
+                                                                = {Chart of Accounts; Column: X; Row: <current>}                                                    -- (Full account name)
+                                                        AND {Transactions - Budget; Column K: Row <corresponding>}                                                  -- (Spread flag/days)
+                                                                is not blank
+                                                )
+                                                MULTIPLY BY {Chart of Accounts; Column: Z; Row: <current>}                                                          -- (Contra flag)
+                                                MULTIPLY BY (
+                                                                IF account increases by credits THEN:
+                                                                    1
+                                                                ELSE
+                                                                    -1
+                                                            )
+                                            )
+                                            /*  __END__  - Credits /*
+                                        )
+                                        /*
+                                         *  __END__  -      Budget date *after* end of month of TODAY
+                                         *              AND Budget date *on or before* Cash Flow date
+                                         */
+                                        PLUS (
+                                        /*
+                                         * __START__ -      Budget date *after* end of month of TODAY
+                                         *              AND Budget date *on or before* end of momnth prior to Cash Flow date
+                                         */
+                                            /* __START__ - Debits */
+                                            (
+                                                Sum of:
+                                                            {Transactions - Budget; Column D; Row 3}                    -- (Debits)
+                                                    through {Transactions - Budget; Column D; Row 5000}
+                                                    where:
+                                                            {Transactions - Budget; Column A: Row <corresponding>}      -- (Budget Date)
+                                                                > end of month of TODAY
+                                                        AND {Transactions - Budget; Column A: Row <corresponding>}      -- (Budget Date)
+                                                                <= end of month prior to {Column: <current>; Row: 1}    -- (Cash Flow date)
+                                                        AND {Transactions - Budget; Column C: Row <corresponding>}      -- (Full account name)
+                                                                = {Chart of Accounts; Column: X; Row: <current>}        -- (Full account name)
+                                                        AND {Transactions - Budget; Column K: Row <corresponding>}      -- (Spread flag/days)
+                                                                is blank
+                                                Multipiled By:
+                                                    {Chart of Accounts; Column Z; Row: <current>}                       -- (Contra flag)
+                                                Multiplied By:
+                                                    IF account type increases by debits THEN
+                                                        1
+                                                    ELSE
+                                                        -1                                            
+                                            )
+                                            /*  __END__  - Debits  */
+                                            /* __START__ - Credits */
+                                            PLUS
+                                            (
+                                                Sum of:
+                                                            {Transactions - Budget; Column E; Row 3}                    -- (Credits)
+                                                    through {Transactions - Budget; Column E; Row 5000}
+                                                    where:
+                                                            {Transactions - Budget; Column A: Row <corresponding>}      -- (Budget Date)
+                                                                > end of month of TODAY
+                                                        AND {Transactions - Budget; Column A: Row <corresponding>}      -- (Budget Date)
+                                                                <= end of month prior to {Column: <current>; Row: 1}    -- (Cash Flow date)
+                                                        AND {Transactions - Budget; Column C: Row <corresponding>}      -- (Full account name)
+                                                                = {Chart of Accounts; Column: X; Row: <current>}        -- (Full account name)
+                                                        AND {Transactions - Budget; Column K: Row <corresponding>}      -- (Spread flag/days)
+                                                                is blank
+                                                Multipiled By:
+                                                    {Chart of Accounts; Column Z; Row: <current>}                       -- (Contra flag)
+                                                Multiplied By:
+                                                    IF account type increases by debits THEN
+                                                        1
+                                                    ELSE
+                                                        -1
+                                            )
+                                            /*  __END__  - Credits */
+                                        )
+                                        /*
+                                         *  __END__  -      Budget date *after* end of month of TODAY
+                                         *              AND Budget date *on or before* end of momnth prior to Cash Flow date
+                                         */
+                                        
                                         PLUS    (
                                                                 (
                                                                     Sum of:
@@ -395,6 +611,7 @@ Apply Style: Accent 2
                                          *  __END__  - BUDGET MONTH *BEFORE* CASH FLOW MONTH
                                          */
                                     )
+                                )
                                 ELSE:
                                     ZERO
                             )
@@ -511,223 +728,342 @@ Apply Style: Accent 2
                           E$1 > TODAY()
                         , (
                               (
-                                  SUMIFS(
-                                      $'Transactions - Budget'.$D$3:$D$5000
-                                    , $'Transactions - Budget'.$A$3:$A$5000
-                                    , ">" & TODAY()
-                                    , $'Transactions - Budget'.$A$3:$A$5000
-                                    , "<=" & E$1
-                                    , $'Transactions - Budget'.$C$3:$C$5000
-                                    , "=" & $'Chart of Accounts'.$X3
-                                    , $'Transactions - Budget'.$K$3:$K$5000
-                                    , "="
-                                  )
-                                * $'Chart of Accounts'.$Z3
-                                * IF(
-                                      VLOOKUP(
-                                          $'Chart of Accounts'.$V3
-                                        , $Info.$A$5:$Info.$B$9
-                                        , 2
-                                        , 1
-                                      ) = "Dr"
-                                    , 1
-                                    , -1
-                                  )
-                              )
-                            + (
-                                  SUMIFS(
-                                      $'Transactions - Budget'.$E$3:$E$5000
-                                    , $'Transactions - Budget'.$A$3:$A$5000
-                                    , ">" & TODAY()
-                                    , $'Transactions - Budget'.$A$3:$A$5000
-                                    , "<=" & E$1
-                                    , $'Transactions - Budget'.$C$3:$C$5000
-                                    , "=" & $'Chart of Accounts'.$X3
-                                    , $'Transactions - Budget'.$K$3:$K$5000
-                                    , "="
-                                  )
-                                * $'Chart of Accounts'.$Z3
-                                * IF(
-                                      VLOOKUP(
-                                          $'Chart of Accounts'.$V3
-                                        , $Info.$A$5:$B$9
-                                        , 2
-                                        , 1
-                                      ) = "Cr"
-                                    , 1
-                                    , -1
-                                  )
-                              )
-                            + (
-                                  SUMIFS(
-                                      INDIRECT(
-                                          "$'Transactions - Budget'."
-                                        & ADDRESS(
-                                              3
-                                            , 19
-                                              + (
-                                                      (
-                                                          DAY(E$1)
-                                                        - IF (
-                                                              AND (
-                                                                  E$1 >= TODAY()
-                                                                , E$1 <= EOMONTH(TODAY(), 0)
-                                                              )
-                                                            , DAY(TODAY())
-                                                            , 0
-                                                          )
-                                                      )
-                                                    * 2
-                                                )
-                                          )
-                                        & ":"
-                                        & ADDRESS(
-                                              5000
-                                            , 19
-                                              + (
-                                                      (
-                                                          DAY(E$1)
-                                                        - IF (
-                                                              AND (
-                                                                  E$1 >= TODAY()
-                                                                , E$1 <= EOMONTH(TODAY(), 0)
-                                                              )
-                                                            , DAY(TODAY())
-                                                            , 0
-                                                          )
-                                                      )
-                                                    * 2
-                                                )
-                                          )
+                                  (
+                                      SUMIFS(
+                                          $'Transactions - Budget'.$D$3:$D$5000
+                                        , $'Transactions - Budget'.$A$3:$A$5000
+                                        , ">" & TODAY()
+                                        , $'Transactions - Budget'.$A$3:$A$5000
+                                        , "<=" & E$1
+                                        , $'Transactions - Budget'.$C$3:$C$5000
+                                        , "=" & $'Chart of Accounts'.$X3
+                                        , $'Transactions - Budget'.$K$3:$K$5000
+                                        , "="
                                       )
-                                    , $'Transactions - Budget'.$A$3:$A$5000
-                                    , ">" & EOMONTH(E$1, -1)
-                                    , $'Transactions - Budget'.$A$3:$A$5000
-                                    , "<=" & E$1
-                                    , $'Transactions - Budget'.$C$3:$C$5000
-                                    , "=" & $'Chart of Accounts'.$X3
-                                    , $'Transactions - Budget'.$K$3:$K$5000
-                                    , "<>"
-                                  )
-                                * $'Chart of Accounts'.$Z3
-                                * IF(
-                                      VLOOKUP(
-                                          $'Chart of Accounts'.$V3
-                                        , $Info.$A$5:$Info.$B$9
-                                        , 2
+                                    * $'Chart of Accounts'.$Z3
+                                    * IF(
+                                          VLOOKUP(
+                                              $'Chart of Accounts'.$V3
+                                            , $Info.$A$5:$Info.$B$9
+                                            , 2
+                                            , 1
+                                          ) = "Dr"
                                         , 1
-                                      ) = "Dr"
-                                    , 1
-                                    , -1
-                                  )
-                              )
-                            + (
-                                  SUMIFS(
-                                      INDIRECT(
-                                          "$'Transactions - Budget'."
-                                        & ADDRESS(
-                                              3
-                                            , 19
-                                              + (
-                                                      (
-                                                          DAY(E$1)
-                                                        - IF (
-                                                              AND (
-                                                                  E$1 >= TODAY()
-                                                                , E$1 <= EOMONTH(TODAY(), 0)
-                                                              )
-                                                            , DAY(TODAY())
-                                                            , 0
-                                                          )
-                                                      )
-                                                    * 2
-                                                )
-                                              + 1
-                                          )
-                                        & ":"
-                                        & ADDRESS(
-                                              5000
-                                            , 19
-                                              + (
-                                                      (
-                                                          DAY(E$1)
-                                                        - IF (
-                                                              AND (
-                                                                  E$1 >= TODAY()
-                                                                , E$1 <= EOMONTH(TODAY(), 0)
-                                                              )
-                                                            , DAY(TODAY())
-                                                            , 0
-                                                          )
-                                                      )
-                                                    * 2
-                                                )
-                                              + 1
-                                          )
+                                        , -1
                                       )
-                                    , $'Transactions - Budget'.$A$3:$A$5000
-                                    , ">" & EOMONTH(E$1, -1)
-                                    , $'Transactions - Budget'.$A$3:$A$5000
-                                    , "<=" & E$1
-                                    , $'Transactions - Budget'.$C$3:$C$5000
-                                    , "=" & $'Chart of Accounts'.$X3
-                                    , $'Transactions - Budget'.$K$3:$K$5000
-                                    , "<>"
                                   )
-                                * $'Chart of Accounts'.$Z3
-                                * IF(
-                                      VLOOKUP(
-                                          $'Chart of Accounts'.$V3
-                                        , $Info.$A$5:$Info.$B$9
-                                        , 2
+                                + (
+                                      SUMIFS(
+                                          $'Transactions - Budget'.$E$3:$E$5000
+                                        , $'Transactions - Budget'.$A$3:$A$5000
+                                        , ">" & TODAY()
+                                        , $'Transactions - Budget'.$A$3:$A$5000
+                                        , "<=" & E$1
+                                        , $'Transactions - Budget'.$C$3:$C$5000
+                                        , "=" & $'Chart of Accounts'.$X3
+                                        , $'Transactions - Budget'.$K$3:$K$5000
+                                        , "="
+                                      )
+                                    * $'Chart of Accounts'.$Z3
+                                    * IF(
+                                          VLOOKUP(
+                                              $'Chart of Accounts'.$V3
+                                            , $Info.$A$5:$B$9
+                                            , 2
+                                            , 1
+                                          ) = "Cr"
                                         , 1
-                                      ) = "Cr"
-                                    , 1
-                                    , -1
+                                        , -1
+                                      )
                                   )
                               )
                             + (
-                                  SUMIFS(
-                                      $'Transactions - Budget'.$D$3:$D$5000
-                                    , $'Transactions - Budget'.$A$3:$A$5000
-                                    , "<=" & EOMONTH(E$1, -1)
-                                    , $'Transactions - Budget'.$C$3:$C$5000
-                                    , "=" & $'Chart of Accounts'.$X3
-                                    , $'Transactions - Budget'.$K$3:$K$5000
-                                    , "<>"
-                                  )
-                                * $'Chart of Accounts'.$Z3
-                                * IF(
-                                      VLOOKUP(
-                                          $'Chart of Accounts'.$V3
-                                        , $Info.$A$5:$Info.$B$9
-                                        , 2
+                                  (
+
+                                      SUMIFS(
+                                          INDIRECT(
+                                              "$'Transactions - Budget'."
+                                            & ADDRESS(
+                                                  3
+                                                ,   19
+                                                  + (
+                                                          IF(
+                                                              E$1 <= EOMONTH(TODAY(), 0)
+                                                            , DAY(E$1)
+                                                            , DAY(EOMONTH(TODAY(), 0))
+                                                          )
+                                                        * 2
+                                                    )
+                                              )
+                                            & ":"
+                                            & ADDRESS(
+                                                  5000
+                                                ,   19
+                                                  + (
+                                                          IF(
+                                                              E$1 <= EOMONTH(TODAY(), 0)
+                                                            , DAY(E$1)
+                                                            , DAY(EOMONTH(TODAY(), 0))
+                                                          )
+                                                        * 2
+                                                    )
+                                              )
+                                          )
+                                        , $'Transactions - Budget'.$A$3:$A$5000
+                                        , ">" & EOMONTH(TODAY(), -1)
+                                        , $'Transactions - Budget'.$A$3:$A$5000
+                                        , "<=" & EOMONTH(TODAY(), 0)
+                                        , $'Transactions - Budget'.$A$3:$A$5000
+                                        , "<=" & E$1
+                                        , $'Transactions - Budget'.$C$3:$C$5000
+                                        , "=" & $'Chart of Accounts'.$X3
+                                        , $'Transactions - Budget'.$K$3:$K$5000
+                                        , "<>"
+                                      )
+                                    * $'Chart of Accounts'.$Z3
+                                    * IF(
+                                          VLOOKUP(
+                                              $'Chart of Accounts'.$V3
+                                            , $Info.$A$5:$Info.$B$9
+                                            , 2
+                                            , 1
+                                          ) = "Dr"
                                         , 1
-                                      ) = "Dr"
-                                    , 1
-                                    , -1
+                                        , -1
+                                      )
+                                  )
+                                + (
+                                      SUMIFS(
+                                          INDIRECT(
+                                              "$'Transactions - Budget'."
+                                            & ADDRESS(
+                                                  3
+                                                ,   19
+                                                  + (
+                                                          IF(
+                                                              E$1 <= EOMONTH(TODAY(), 0)
+                                                            , DAY(E$1)
+                                                            , DAY(EOMONTH(TODAY(), 0))
+                                                          )
+                                                        * 2
+                                                    )
+                                                  + 1
+                                              )
+                                            & ":"
+                                            & ADDRESS(
+                                                  5000
+                                                ,   19
+                                                  + (
+                                                          IF(
+                                                              E$1 <= EOMONTH(TODAY(), 0)
+                                                            , DAY(E$1)
+                                                            , DAY(EOMONTH(TODAY(), 0))
+                                                          )
+                                                        * 2
+                                                    )
+                                                  + 1
+                                              )
+                                          )
+                                        , $'Transactions - Budget'.$A$3:$A$5000
+                                        , ">" & EOMONTH(TODAY(), -1)
+                                        , $'Transactions - Budget'.$A$3:$A$5000
+                                        , "<=" & EOMONTH(TODAY(), 0)
+                                        , $'Transactions - Budget'.$A$3:$A$5000
+                                        , "<=" & E$1
+                                        , $'Transactions - Budget'.$C$3:$C$5000
+                                        , "=" & $'Chart of Accounts'.$X3
+                                        , $'Transactions - Budget'.$K$3:$K$5000
+                                        , "<>"
+                                      )
+                                    * $'Chart of Accounts'.$Z3
+                                    * IF(
+                                          VLOOKUP(
+                                              $'Chart of Accounts'.$V3
+                                            , $Info.$A$5:$Info.$B$9
+                                            , 2
+                                            , 1
+                                          ) = "Cr"
+                                        , 1
+                                        , -1
+                                      )
                                   )
                               )
                             + (
-                                  SUMIFS(
-                                      $'Transactions - Budget'.$E$3:$E$5000
-                                    , $'Transactions - Budget'.$A$3:$A$5000
-                                    , "<=" & EOMONTH(E$1, -1)
-                                    , $'Transactions - Budget'.$C$3:$C$5000
-                                    , "=" & $'Chart of Accounts'.$X3
-                                    , $'Transactions - Budget'.$K$3:$K$5000
-                                    , "<>"
-                                  )
-                                * $'Chart of Accounts'.$Z3
-                                * IF(
-                                      VLOOKUP(
-                                          $'Chart of Accounts'.$V3
-                                        , $Info.$A$5:$B$9
-                                        , 2
+                                  -(
+                                      SUMIFS(
+                                          $'Transactions - Budget'.$P$3:$P$5000
+                                        , $'Transactions - Budget'.$A$3:$A$5000
+                                        , ">" & EOMONTH(TODAY(), -1)
+                                        , $'Transactions - Budget'.$A$3:$A$5000
+                                        , "<=" & EOMONTH(TODAY(), 0)
+                                        , $'Transactions - Budget'.$A$3:$A$5000
+                                        , "<=" & E$1
+                                        , $'Transactions - Budget'.$C$3:$C$5000
+                                        , "=" & $'Chart of Accounts'.$X3
+                                        , $'Transactions - Budget'.$K$3:$K$5000
+                                        , "<>"
+                                      )
+                                    * $'Chart of Accounts'.$Z3
+                                    * IF(
+                                          VLOOKUP(
+                                              $'Chart of Accounts'.$V3
+                                            , $Info.$A$5:$Info.$B$9
+                                            , 2
+                                            , 1
+                                          ) = "Dr"
                                         , 1
-                                      ) = "Cr"
-                                    , 1
-                                    , -1
+                                        , -1
+                                      )
+                                  )
+                                + -(
+                                      SUMIFS(
+                                          $'Transactions - Budget'.$Q$3:$Q$5000
+                                        , $'Transactions - Budget'.$A$3:$A$5000
+                                        , ">" & EOMONTH(TODAY(), -1)
+                                        , $'Transactions - Budget'.$A$3:$A$5000
+                                        , "<=" & EOMONTH(TODAY(), 0)
+                                        , $'Transactions - Budget'.$A$3:$A$5000
+                                        , "<=" & E$1
+                                        , $'Transactions - Budget'.$C$3:$C$5000
+                                        , "=" & $'Chart of Accounts'.$X3
+                                        , $'Transactions - Budget'.$K$3:$K$5000
+                                        , "<>"
+                                      )
+                                    * $'Chart of Accounts'.$Z3
+                                    * IF(
+                                          VLOOKUP(
+                                              $'Chart of Accounts'.$V3
+                                            , $Info.$A$5:$Info.$B$9
+                                            , 2
+                                            , 1
+                                          ) = "Cr"
+                                        , 1
+                                        , -1
+                                      )
+                                  )
+                              )
+                            + (
+                                  (
+                                      SUMIFS(
+                                          INDIRECT(
+                                              "$'Transactions - Budget'."
+                                            & ADDRESS(
+                                                  3
+                                                , 19 + (DAY(E$1) * 2)
+                                              )
+                                            & ":"
+                                            & ADDRESS(
+                                                  5000
+                                                , 19 + (DAY(E$1) * 2)
+                                              )
+                                          )
+                                        , $'Transactions - Budget'.$A$3:$A$5000
+                                        , ">" & EOMONTH(TODAY(), 0)
+                                        , $'Transactions - Budget'.$A$3:$A$5000
+                                        , ">" & EOMONTH(E$1, -1)
+                                        , $'Transactions - Budget'.$A$3:$A$5000
+                                        , "<=" & E$1
+                                        , $'Transactions - Budget'.$C$3:$C$5000
+                                        , "=" & $'Chart of Accounts'.$X3
+                                        , $'Transactions - Budget'.$K$3:$K$5000
+                                        , "<>"
+                                      )
+                                    * $'Chart of Accounts'.$Z3
+                                    * IF(
+                                          VLOOKUP(
+                                              $'Chart of Accounts'.$V3
+                                            , $Info.$A$5:$Info.$B$9
+                                            , 2
+                                            , 1
+                                          ) = "Dr"
+                                        , 1
+                                        , -1
+                                      )
+                                  )
+                                + (
+                                      SUMIFS(
+                                          INDIRECT(
+                                              "$'Transactions - Budget'."
+                                            & ADDRESS(
+                                                  3
+                                                , 19 + (DAY(E$1) * 2) + 1
+                                              )
+                                            & ":"
+                                            & ADDRESS(
+                                                  5000
+                                                , 19 + (DAY(E$1) * 2) + 1
+                                              )
+                                          )
+                                        , $'Transactions - Budget'.$A$3:$A$5000
+                                        , ">" & EOMONTH(TODAY(), 0)
+                                        , $'Transactions - Budget'.$A$3:$A$5000
+                                        , ">" & EOMONTH(E$1, -1)
+                                        , $'Transactions - Budget'.$A$3:$A$5000
+                                        , "<=" & E$1
+                                        , $'Transactions - Budget'.$C$3:$C$5000
+                                        , "=" & $'Chart of Accounts'.$X3
+                                        , $'Transactions - Budget'.$K$3:$K$5000
+                                        , "<>"
+                                      )
+                                    * $'Chart of Accounts'.$Z3
+                                    * IF(
+                                          VLOOKUP(
+                                              $'Chart of Accounts'.$V3
+                                            , $Info.$A$5:$Info.$B$9
+                                            , 2
+                                            , 1
+                                          ) = "Cr"
+                                        , 1
+                                        , -1
+                                      )
+                                  )
+                                + (
+                                      SUMIFS(
+                                          $'Transactions - Budget'.$D$3:$D$5000
+                                        , $'Transactions - Budget'.$A$3:$A$5000
+                                        , ">" & EOMONTH(TODAY(), 0)
+                                        , $'Transactions - Budget'.$A$3:$A$5000
+                                        , "<=" & EOMONTH(E$1, -1)
+                                        , $'Transactions - Budget'.$C$3:$C$5000
+                                        , "=" & $'Chart of Accounts'.$X3
+                                        , $'Transactions - Budget'.$K$3:$K$5000
+                                        , "<>"
+                                      )
+                                    * $'Chart of Accounts'.$Z3
+                                    * IF(
+                                          VLOOKUP(
+                                              $'Chart of Accounts'.$V3
+                                            , $Info.$A$5:$Info.$B$9
+                                            , 2
+                                            , 1
+                                          ) = "Dr"
+                                        , 1
+                                        , -1
+                                      )
+                                  )
+                                + (
+                                      SUMIFS(
+                                          $'Transactions - Budget'.$E$3:$E$5000
+                                        , $'Transactions - Budget'.$A$3:$A$5000
+                                        , ">" & EOMONTH(TODAY(), 0)
+                                        , $'Transactions - Budget'.$A$3:$A$5000
+                                        , "<=" & EOMONTH(E$1, -1)
+                                        , $'Transactions - Budget'.$C$3:$C$5000
+                                        , "=" & $'Chart of Accounts'.$X3
+                                        , $'Transactions - Budget'.$K$3:$K$5000
+                                        , "<>"
+                                      )
+                                    * $'Chart of Accounts'.$Z3
+                                    * IF(
+                                          VLOOKUP(
+                                              $'Chart of Accounts'.$V3
+                                            , $Info.$A$5:$Info.$B$9
+                                            , 2
+                                            , 1
+                                          ) = "Cr"
+                                        , 1
+                                        , -1
+                                      )
                                   )
                               )
                           )

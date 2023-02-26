@@ -156,7 +156,7 @@ Accent 3
         ELSE
             ""
 
-#### LOC Code (from K4)
+#### LOC Code (from H4)
 
     =IF(
           $C4=""
@@ -196,10 +196,15 @@ Accent 3
 
     =ROUNDUP(
             $D4
-          / (
-                  DAYSINMONTH($A4)
-                - DAY($A4)
-                + 1
+          / MIN(
+                $K4
+              , (
+                  - (
+                        DAY($A4)
+                      - DAYSINMONTH($A4)
+                    )
+                  + 1
+                )
             )
         , 2
     )
@@ -219,10 +224,15 @@ Accent 3
 
     =ROUNDUP(
             $E4
-          / (
-                  DAYSINMONTH($A4)
-                - DAY($A4)
-                + 1
+          / MIN(
+                $K4
+              , (
+                  - (
+                        DAY($A4)
+                      - DAYSINMONTH($A4)
+                    )
+                  + 1
+                )
             )
         , 2
     )
@@ -268,15 +278,19 @@ Accent 3
         , ROUNDUP(
               (
                   $D4
-                / (
-                      DAYSINMONTH($A4)
-                    - DAY($A4)
-                    + 1
+                / MIN(
+                    $K4
+                  , (
+                      - (
+                            DAY($A4)
+                          - DAYSINMONTH($A4)
+                        )
+                      + 1
+                    )
                   )
-                * (
-                      TODAY()
-                    - $A4
-                    + 1
+                * MIN(
+                      $K4
+                    , (DAY(TODAY()) - DAY($A4) + 1)
                   )
               )
             , 2
@@ -319,20 +333,24 @@ Accent 3
               $K4=""
             , EOMONTH($A4, 0) < TODAY()
           )
-        , $D4
+        , $E4
         , 1
         , ROUNDUP(
               (
                   $E4
-                / (
-                      DAYSINMONTH($A4)
-                    - DAY($A4)
-                    + 1
+                / MIN(
+                    $K4
+                  , (
+                      - (
+                            DAY($A4)
+                          - DAYSINMONTH($A4)
+                        )
+                      + 1
+                    )
                   )
-                * (
-                      TODAY()
-                    - $A4
-                    + 1
+                * MIN(
+                      $K4
+                    , (DAY(TODAY()) - DAY($A4) + 1)
                   )
               )
             , 2
@@ -431,17 +449,20 @@ Accent 3
             , 0
           )
         , ISNUMBER($K4)
-        , IF(
-              U$1 <= MIN(
-                      $K4
-                    , (
-                        - (
-                              DAY($A4)
-                            - DAYSINMONTH($A4)
+        , IFS(
+              AND(
+                  U$1 >= DAY($A4)
+                , U$1 < DAY($A4) + MIN(
+                              $K4
+                            , (
+                                - (
+                                      DAY($A4)
+                                    - DAYSINMONTH($A4)
+                                  )
+                                + 1
+                              )
                           )
-                        + 1
-                      )
-                  )
+              )
             , ROUND(
                     $D4
                   / MIN(
@@ -454,20 +475,26 @@ Accent 3
                           + 1
                         )
                     )
-                  * U$1
+                  * (U$1 - DAY($A4) + 1)
                 , 2
               )
+            , U$1 >= DAY($A4)
+            , $D4
+            , 1
             , 0
           )
         , $K4 <> ""
-        , IF(
-              U$1 <= (
-                    - (
-                          DAY($A4)
-                        - DAYSINMONTH($A4)
-                      )
-                    + 1
-                )
+        , IFS(
+              AND(
+                  U$1 >= DAY($A4)
+                , U$1 < DAY($A4) + (
+                        - (
+                              DAY($A4)
+                            - DAYSINMONTH($A4)
+                          )
+                        + 1
+                    )
+              )
             , ROUND(
                     $D4
                   / (
@@ -477,9 +504,12 @@ Accent 3
                         )
                       + 1
                     )
-                  * U$1
+                  * (U$1 - DAY($A4) + 1)
                 , 2
               )
+            , U$1 >= DAY($A4)
+            , $D4
+            , 1
             , 0
           )
     )
@@ -551,22 +581,25 @@ Accent 3
     =IFS(
           $K4 = ""
         , IF(
-              U$1 = DAY($A4)
+              V$1 = DAY($A4)
             , $E4
             , 0
           )
         , ISNUMBER($K4)
-        , IF(
-              U$1 <= MIN(
-                      $K4
-                    , (
-                        - (
-                              DAY($A4)
-                            - DAYSINMONTH($A4)
+        , IFS(
+              AND(
+                  V$1 >= DAY($A4)
+                , V$1 < DAY($A4) + MIN(
+                              $K4
+                            , (
+                                - (
+                                      DAY($A4)
+                                    - DAYSINMONTH($A4)
+                                  )
+                                + 1
+                              )
                           )
-                        + 1
-                      )
-                  )
+              )
             , ROUND(
                     $E4
                   / MIN(
@@ -579,20 +612,26 @@ Accent 3
                           + 1
                         )
                     )
-                  * U$1
+                  * (V$1 - DAY($A4) + 1)
                 , 2
               )
+            , V$1 >= DAY($A4)
+            , $E4
+            , 1
             , 0
           )
         , $K4 <> ""
-        , IF(
-              U$1 <= (
-                    - (
-                          DAY($A4)
-                        - DAYSINMONTH($A4)
-                      )
-                    + 1
-                )
+        , IFS(
+              AND(
+                  V$1 >= DAY($A4)
+                , V$1 < DAY($A4) + (
+                        - (
+                              DAY($A4)
+                            - DAYSINMONTH($A4)
+                          )
+                        +1
+                    )
+              )
             , ROUND(
                     $E4
                   / (
@@ -602,9 +641,12 @@ Accent 3
                         )
                       + 1
                     )
-                  * U$1
+                  * (V$1 - DAY($A4) + 1)
                 , 2
               )
+            , V$1 >= DAY($A4)
+            , $E4
+            , 1
             , 0
           )
     )
