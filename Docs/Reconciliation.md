@@ -193,7 +193,7 @@ Apply Style: Accent 2
             ,   $'Chart of Accounts'.$Y3
               + (
                     (
-                        IF (
+                          IF (
                               $'Info'.$B$2 = TRUE()
                             , SUMIFS(
                                   $'Transactions - Actual'.$G$3:$G$5000
@@ -211,7 +211,9 @@ Apply Style: Accent 2
                                 , $'Transactions - Actual'.$C$3:$C$5000
                                 , "<=" & TODAY()
                               )
-                        ) * IF(
+                          )
+			* $'Chart of Accounts'.$Z3
+			* IF (
                               VLOOKUP(
                                   $'Chart of Accounts'.$V3
                                 , $'Info'.$A$5:$'Info'.$B$9
@@ -220,10 +222,10 @@ Apply Style: Accent 2
                               ) = "Dr"
                             , 1
                             , -1
-                        )
+                          )
                     )
                   + (
-                        IF (
+                          IF (
                               $'Info'.$B$2 = TRUE()
                             , SUMIFS(
                                   $'Transactions - Actual'.$H$3:$H$5000
@@ -241,7 +243,9 @@ Apply Style: Accent 2
                                 , $'Transactions - Actual'.$C$3:$C$5000
                                 , "<=" & TODAY()
                               )
-                        ) * IF(
+                          )
+			* $'Chart of Accounts'.$Z3
+			* IF(
                               VLOOKUP(
                                   $'Chart of Accounts'.$V3
                                 , $'Info'.$A$5:$'Info'.$B$9

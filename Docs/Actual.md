@@ -127,6 +127,10 @@ Apply Style: Accent 1
                           1 if account increases by debits
                       OR -1 if account increases by credits
                 )
+                multiplied by(                                                                                                              -- (contra account?)
+                    1 for "regular" account
+                    -1 for "contra" account
+                )
             )
             MINUS
             (
@@ -176,6 +180,10 @@ Apply Style: Accent 1
                         1 if account increases by credits
                     OR -1 if account increases by debits
                 )
+                multiplied by(                                                                                                               -- (contra account?)
+                    1 for "regular" account
+                    -1 for "contra" account
+                )
         TRUE:
             emtpy string
 
@@ -192,15 +200,15 @@ Apply Style: Accent 1
         , IFS(
               $A3<>""
             , SUMIF(
-                  $'Chart of Accounts'.$V$3:$V$200
+                  $'Chart of Accounts'.$V$3:$'Chart of Accounts'.$V$200
                 , $'Chart of Accounts'.$Q3
-                , $'Chart of Accounts'.$Y$3:$Y$200
+                , $'Chart of Accounts'.$Y$3:$'Chart of Accounts'.$Y$200
               )
             , $B3<>""
             , SUMIF(
-                  $'Chart of Accounts'.$W$3:$W$200
+                  $'Chart of Accounts'.$W$3:$'Chart of Accounts'.$W$200
                 , $'Chart of Accounts'.$S3
-                , $'Chart of Accounts'.$Y$3:$Y$200
+                , $'Chart of Accounts'.$Y$3:$'Chart of Accounts'.$Y$200
               )
             , $C3<>""
             , $'Chart of Accounts'.$Y3
@@ -211,101 +219,84 @@ Apply Style: Accent 1
         , IFERROR(C3+D3, "")
         , $A3<>""
         , SUMIFS(
-              INDIRECT(
-                  ADDRESS(ROW() + 1, COLUMN())
-                & ":"
-                & ADDRESS(ROW() + MATCH(".+",$A4:$A$200,0) - 1, COLUMN())
-              )
-            , INDIRECT (
-                  ADDRESS(ROW() + 1, 3)
-                & ":"
-                & ADDRESS(ROW() + MATCH(".+",$A4:$A$200,0) - 1, 3)
-              )
+              INDIRECT(ADDRESS(ROW() + 1, COLUMN()) & ":" & ADDRESS(ROW() + MATCH(".+",$A4:$A$200,0) - 1, COLUMN()))
+            , INDIRECT(ADDRESS(ROW() + 1, 3)        & ":" & ADDRESS(ROW() + MATCH(".+",$A4:$A$200,0) - 1, 3))
             , "=.+"
           )
         , $B3<>""
         , SUMIFS(
-              INDIRECT(
-                ADDRESS(ROW() + 1, COLUMN())
-                & ":"
-                & ADDRESS(ROW() + MATCH(".+",$B4:$B$200,0) - 1, COLUMN())
-              )
-            , INDIRECT (
-                ADDRESS(ROW() + 1, 3)
-                & ":"
-                & ADDRESS(ROW() + MATCH(".+",$B4:$B$200,0) - 1, 3)
-              )
+              INDIRECT(ADDRESS(ROW() + 1, COLUMN()) & ":" & ADDRESS(ROW() + MATCH(".+",$B4:$B$200,0) - 1, COLUMN()))
+            , INDIRECT(ADDRESS(ROW() + 1, 3)        & ":" & ADDRESS(ROW() + MATCH(".+",$B4:$B$200,0) - 1, 3))
             , "=.+"
           )
         , $C3<>""
-        ,   (
-                IF (
-                      $Info.$B$2 = TRUE()
-                    , SUMIFS(
-                          $'Transactions - Actual'.$G$3:$G$5000
-                        , $'Transactions - Actual'.$F$3:$F$5000
-                        , "=" & $'Chart of Accounts'.$X3
-                        , $'Transactions - Actual'.$B$3:$B$5000
-                        , ">=" & DATE($Info.$B$1; MONTH("01-" & E$1 & "-01"), 1)
-                        , $'Transactions - Actual'.$B$3:$B$5000
-                        , "<=" & EOMONTH(DATE($Info.$B$1, MONTH("01-" & E$1 & "-01"), 01), 0)
-                      )
-                    , SUMIFS(
-                          $'Transactions - Actual'.$G$3:$G$5000
-                        , $'Transactions - Actual'.$F$3:$F$5000
-                        , "=" & $'Chart of Accounts'.$X3
-                        , $'Transactions - Actual'.$B$3:$B$5000
-                        , ">=" & DATE($Info.$B$1, MONTH("01-" & E$1 & "-01"), 01)
-                        , $'Transactions - Actual'.$B$3:$B$5000
-                        , "<=" & EOMONTH(DATE($Info.$B$1, MONTH("01-" & E$1 & "-01"), 1), 0)
-                        , $'Transactions - Actual'.$B$3:$B$5000
-                        , "<=" & TODAY()
-                      )
-                ) * IF(
-                      VLOOKUP(
-                          $'Chart of Accounts'.$V3
-                        , $Info.$A$5:$B$9
-                        , 2
-                        , 1
-                      ) = "Dr"
+        , (
+            IF(
+                  $Info.$B$2 = TRUE()
+                , SUMIFS(
+                      $'Transactions - Actual'.$G$3:$'Transactions - Actual'.$G$6000
+                    , $'Transactions - Actual'.$F$3:$'Transactions - Actual'.$F$6000
+                    , "=" & $'Chart of Accounts'.$X3
+                    , $'Transactions - Actual'.$B$3:$'Transactions - Actual'.$B$6000
+                    , ">=" & DATE($Info.$B$1, MONTH("01-" & E$1 & "-01"), 1)
+                    , $'Transactions - Actual'.$B$3:$'Transactions - Actual'.$B$6000
+                    , "<=" & EOMONTH(DATE($Info.$B$1, MONTH("01-" & E$1 & "-01"), 1), 0)
+                  )
+                , SUMIFS(
+                      $'Transactions - Actual'.$G$3:$'Transactions - Actual'.$G$6000
+                    , $'Transactions - Actual'.$F$3:$'Transactions - Actual'.$F$6000
+                    , "=" & $'Chart of Accounts'.$X3
+                    , $'Transactions - Actual'.$B$3:$'Transactions - Actual'.$B$6000
+                    , ">=" & DATE($Info.$B$1, MONTH("01-" & E$1 & "-01"), 1)
+                    , $'Transactions - Actual'.$B$3:$'Transactions - Actual'.$B$6000
+                    , "<=" & EOMONTH(DATE($Info.$B$1, MONTH("01-" & E$1 & "-01"), 1), 0)
+                    , $'Transactions - Actual'.$B$3:$'Transactions - Actual'.$B$6000
+                    , "<=" & TODAY()
+                  )
+            ) * IF(
+                  VLOOKUP(
+                      $'Chart of Accounts'.$V3
+                    , $Info.$A$5:$Info.$B$9
+                    , 2
                     , 1
-                    , -1
-                )
-            )
-          + (
-                IF (
-                      $Info.$B$2 = TRUE()
-                    , SUMIFS(
-                          $'Transactions - Actual'.$H$3:$H$5000
-                        , $'Transactions - Actual'.$F$3:$F$5000
-                        , "=" & $'Chart of Accounts'.$X3
-                        , $'Transactions - Actual'.$B$3:$B$5000
-                        , ">=" & DATE($Info.$B$1, MONTH("01-" & E$1 & "-01"), 1)
-                        , $'Transactions - Actual'.$B$3:$B$5000
-                        , "<=" & EOMONTH(DATE($Info.$B$1, MONTH("01-" & E$1 & "-01"), 1), 0)
-                      )
-                    , SUMIFS(
-                          $'Transactions - Actual'.$H$3:$H$5000
-                        , $'Transactions - Actual'.$F$3:$F$5000
-                        , "=" & $'Chart of Accounts'.$X3
-                        , $'Transactions - Actual'.$B$3:$B$5000
-                        , ">=" & DATE($Info.$B$1, MONTH("01-" & E$1 & "-01"), 1)
-                        , $'Transactions - Actual'.$B$3:$B$5000
-                        , "<=" & EOMONTH(DATE($Info.$B$1, MONTH("01-" & E$1 & "-01"), 1), 0)
-                        , $'Transactions - Actual'.$B$3:$B$5000
-                        , "<=" & TODAY()
-                      )
-                ) * IF(
-                      VLOOKUP(
-                          $'Chart of Accounts'.$V3
-                        , $Info.$A$5:$B$9
-                        , 2
-                        , 1
-                      ) = "Cr"
+                  ) = "Dr"
+                , 1
+                , -1
+            ) * $'Chart of Accounts'.$Z3
+          ) + (
+            IF(
+                  $Info.$B$2 = TRUE()
+                , SUMIFS(
+                      $'Transactions - Actual'.$H$3:$'Transactions - Actual'.$H$6000
+                    , $'Transactions - Actual'.$F$3:$'Transactions - Actual'.$F$6000
+                    , "=" & $'Chart of Accounts'.$X3
+                    , $'Transactions - Actual'.$B$3:$'Transactions - Actual'.$B$6000
+                    , ">=" & DATE($Info.$B$1, MONTH("01-" & E$1 & "-01"), 1)
+                    , $'Transactions - Actual'.$B$3:$'Transactions - Actual'.$B$6000
+                    , "<=" & EOMONTH(DATE($Info.$B$1, MONTH("01-" & E$1 & "-01"), 1), 0)
+                  )
+                , SUMIFS(
+                      $'Transactions - Actual'.$H$3:$'Transactions - Actual'.$H$6000
+                    , $'Transactions - Actual'.$F$3:$'Transactions - Actual'.$F$6000
+                    , "=" & $'Chart of Accounts'.$X3
+                    , $'Transactions - Actual'.$B$3:$'Transactions - Actual'.$B$6000
+                    , ">=" & DATE($Info.$B$1, MONTH("01-" & E$1 & "-01"), 1)
+                    , $'Transactions - Actual'.$B$3:$'Transactions - Actual'.$B$6000
+                    , "<=" & EOMONTH(DATE($Info.$B$1, MONTH("01-" & E$1 & "-01"), 1), 0)
+                    , $'Transactions - Actual'.$B$3:$'Transactions - Actual'.$B$6000
+                    , "<=" & TODAY()
+                  )
+            ) * IF(
+                  VLOOKUP(
+                      $'Chart of Accounts'.$V3
+                    , $Info.$A$5:$Info.$B$9
+                    , 2
                     , 1
-                    , -1
-                )
-            )
+                  ) = "Cr"
+                , 1
+                , -1
+            ) * $'Chart of Accounts'.$Z3
+          )
         , 1
         , ""
     )
